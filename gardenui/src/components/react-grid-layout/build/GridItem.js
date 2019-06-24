@@ -335,6 +335,7 @@ var GridItem = function (_React$Component) {
 
           var totalHeight = y +_this2.props.h;
 
+          
           // Custom Code - check for total height
           if(totalHeight > 10) {
             return;
@@ -399,6 +400,24 @@ var GridItem = function (_React$Component) {
     
       _this3.setState({ resizing: handlerName === "onResizeStop" ? null : size });
 
+      // console.log("-------------------------------");
+      // console.log("Props: ", _props7);
+      // console.log("Node: ", node);
+      // console.log("-------------------------------");
+      // console.log("Omg does this work?:", i);
+          // console.log("H - ", h);
+          // console.log("H % 3", (h%3));
+          if(h % 5) {
+            // console.log("WE DO NOT HAVE A MATCH");
+            return;
+          }
+
+          // console.log('Width: ', w)
+
+          if(w % 5) {
+            // console.log("No Width Match");
+            return;
+          }
       // Custom Code check for total height
       if(totalHeight > 10) {
         return;
