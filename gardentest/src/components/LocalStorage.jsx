@@ -4,7 +4,7 @@ import RGL, { WidthProvider } from "react-grid-layout";
 let ReactGridLayout = WidthProvider(RGL);
 let originalLayout = getFromLS("layout") || [];
 let secondLayout = originalLayout;
-let totalHeight = 38;
+let totalHeight = 18;
 /**
  * This layout demonstrates how to sync to localstorage.
  */
@@ -13,7 +13,7 @@ class LocalStorageLayout extends React.PureComponent {
     className: "layout",
     cols: 100,
     // cols: { lg: 100, md: 10, sm: 200, xs: 4, xxs: 2 },
-    rowHeight: 1,
+    rowHeight: 5,
     onLayoutChange: function() {}
   };
 
@@ -27,15 +27,20 @@ class LocalStorageLayout extends React.PureComponent {
 
     this.onLayoutChange = this.onLayoutChange.bind(this);
     this.resetLayout = this.resetLayout.bind(this);
+    this.onAddItem = this.onAddItem.bind(this);
   }
 
+
+
   resetLayout() {
+    console.log("About to Reset State 3")
     this.setState({
       layout: originalLayout
     });
   }
 
   secondResetLayout() {
+    console.log("About to Reset State 4")
     this.setState({
       layout: secondLayout
     });
@@ -100,7 +105,35 @@ class LocalStorageLayout extends React.PureComponent {
     // this.testFunction();
   };
 
-  componentDidUpdate(prevProps, prevState) {
+  onAddItem() {
+    // console.log("In Add Item")
+    // console.log(this.state.layout);
+    // console.log(originalLayout)
+    // console.log(JSON.parse('{"layout":[{"w":40,"h":4,"x":60,"y":38,"i":"1","moved":false,"static":false},{"w":59,"h":18,"x":41,"y":10,"i":"2","moved":false,"static":false},{"w":21,"h":10,"x":0,"y":0,"i":"3","moved":false,"static":false},{"w":21,"h":10,"x":25,"y":0,"i":"4","moved":false,"static":false},{"w":21,"h":10,"x":50,"y":28,"i":"5","moved":false,"static":false}]}'))
+    let ls = JSON.parse('{"layout":[{"w":40,"h":4,"x":60,"y":38,"i":"1","moved":false,"static":false},{"w":59,"h":18,"x":41,"y":10,"i":"2","moved":false,"static":false},{"w":21,"h":10,"x":0,"y":0,"i":"3","moved":false,"static":false},{"w":21,"h":10,"x":25,"y":0,"i":"4","moved":false,"static":false},{"w":21,"h":10,"x":50,"y":28,"i":"5","moved":false,"static":false}]}')
+
+    // console.log("LS: ", ls)
+    ls.layout[0].h=7;
+    // console.log(ls)
+    let stringLS = JSON.stringify(ls);
+    // console.log(stringLS);
+    originalLayout = stringLS;
+
+    this.resetLayout();
+
+    // console.log(JSON.parse('{"layout":"John"}'))
+      // "layout":[
+        // {"w":40,"h":4,"x":60,"y":38,"i":"1","moved":false,"static":false},
+        // {"w":59,"h":18,"x":41,"y":10,"i":"2","moved":false,"static":false},
+        // {"w":21,"h":10,"x":0,"y":0,"i":"3","moved":false,"static":false},
+        // {"w":21,"h":10,"x":25,"y":0,"i":"4","moved":false,"static":false},
+        // {"w":21,"h":10,"x":50,"y":28,"i":"5","moved":false,"static":false}
+      // ]
+    // let ls = JSON.parse(JSON.stringify(this.state));
+    // console.log(JSON.parse(global.localStorage.getItem("rgl-7")))
+  }
+
+  componentWillUpdate(prevProps, prevState) {
     let check = false;
     let layout = this.state.layout;
 
@@ -120,8 +153,10 @@ class LocalStorageLayout extends React.PureComponent {
     if (check) {
 
       if (arraysEqual(this.state.layout, originalLayout)) {
+        console.log("About to Reset State 1")
         this.secondResetLayout();
       } else {
+        console.log("About to Reset State 2")
         this.resetLayout();
       }
     }
@@ -130,10 +165,12 @@ class LocalStorageLayout extends React.PureComponent {
   render() {
     return (
       <div>
-        {/* <button onClick={this.resetLayout}>Reset Layout</button>
-        <button onClick={() => saveToLS("layout", this.state.layout)}>
+        <button onClick={this.resetLayout}>Reset Layout</button>
+        <button onClick={this.secondResetLayout}>Second Reset Layout</button>
+        {/* <button onClick={() => saveToLS("layout", this.state.layout)}>
           Save Layout
         </button> */}
+        <button onClick={this.onAddItem}>Add Item</button>
         <ReactGridLayout
           {...this.props}
           layout={this.state.layout}
@@ -142,16 +179,16 @@ class LocalStorageLayout extends React.PureComponent {
           <div key="1" data-grid={{ w: 40, h: 4, x: 75, y: 0 }}>
             <span className="text">1</span>
           </div>
-          <div key="2" data-grid={{ w: 59, h: 18, x: 125, y: 0 }}>
+          <div key="2" data-grid={{ w: 59, h: 1, x: 125, y: 0 }}>
             <span className="text">2</span>
           </div>
-          <div key="3" data-grid={{ w: 21, h: 10, x: 0, y: 0 }}>
+          <div key="3" data-grid={{ w: 21, h: 2, x: 0, y: 0 }}>
             <span className="text">3</span>
           </div>
-          <div key="4" data-grid={{ w: 21, h: 10, x: 25, y: 0 }}>
+          <div key="4" data-grid={{ w: 21, h: 2, x: 25, y: 0 }}>
             <span className="text">4</span>
           </div>
-          <div key="5" data-grid={{ w: 21, h: 10, x: 50, y: 0 }}>
+          <div key="5" data-grid={{ w: 21, h: 2, x: 50, y: 0 }}>
             <span className="text">5</span>
           </div>
         </ReactGridLayout>
