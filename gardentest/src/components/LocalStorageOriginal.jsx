@@ -1,8 +1,58 @@
 import React from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
+import _ from "lodash";
 
 const ReactGridLayout = WidthProvider(RGL);
 const originalLayout = getFromLS("layout") || [];
+
+const testDefaultLayout = [
+  {
+    w: 2,
+    h: 3,
+    x: 0,
+    y: 0,
+    i: "1",
+    moved: false,
+    static: false
+  },
+  {
+    w: 2,
+    h: 5,
+    x: 2,
+    y: 0,
+    i: "2",
+    moved: false,
+    static: false
+  },
+  {
+    w: 2,
+    h: 3,
+    x: 4,
+    y: 0,
+    i: "3",
+    moved: false,
+    static: false
+  },
+  {
+    w: 2,
+    h: 3,
+    x: 6,
+    y: 0,
+    i: "4",
+    moved: false,
+    static: false
+  },
+  {
+    w: 2,
+    h: 1,
+    x: 8,
+    y: 0,
+    i: "5",
+    moved: false,
+    static: false
+  }
+];
+
 /**
  * This layout demonstrates how to sync to localstorage.
  */
@@ -19,10 +69,12 @@ class LocalStorageLayout extends React.PureComponent {
     super(props);
 
     this.state = {
-      layout: JSON.parse(JSON.stringify(originalLayout)),
-      totalHeight: 5,
+        layout: JSON.parse(JSON.stringify(originalLayout)),
+    //   layout: testDefaultLayout,
+      totalHeight: 12,
       mouse: false,
-      rollbackLayout: []
+      rollBackLayout: [],
+      newCounter: 0
     };
 
     this.onLayoutChange = this.onLayoutChange.bind(this);
@@ -30,6 +82,7 @@ class LocalStorageLayout extends React.PureComponent {
     this.setHeight = this.setHeight.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.rollBackLayout = this.rollBackLayout.bind(this);
+    // this.onAddItem = this.onAddItem.bind(this);
   }
 
   resetLayout() {
@@ -40,11 +93,14 @@ class LocalStorageLayout extends React.PureComponent {
   }
 
   rollBackLayout() {
-      const { rollbackLayout } = this.state;
-      this.setState({ layout : rollbackLayout });
+    const { rollBackLayout } = this.state;
+    console.log("Roll Back Layout: ", rollBackLayout)
+    this.setState({ layout: rollBackLayout });
   }
 
   setHeight() {
+    console.log("State - ", this.state);
+    console.log(JSON.stringify(this.state.layout));
     this.setState({ totalHeight: 20 });
   }
 
@@ -55,16 +111,12 @@ class LocalStorageLayout extends React.PureComponent {
     this.props.onLayoutChange(layout); // updates status display
   }
 
-  //WARNING! To be deprecated in React v17. Use componentDidUpdate instead.
-  //   componentWillUpdate(nextProps, nextState) {
-  //       console.log("******Component Will Update")
-  //   }
-
   handleMouseDown() {
-    this.setState({ 
-        mouse: true,
-        sideLayout: this.state.layout
-     });
+      console.log("Mouse Down")
+    this.setState({
+      mouse: true,
+      rollBackLayout: this.state.layout
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -101,14 +153,78 @@ class LocalStorageLayout extends React.PureComponent {
     }
   }
 
-  //WARNING! To be deprecated in React v17. Use new lifecycle static getDerivedStateFromProps instead.
-  //   componentWillReceiveProps(nextProps) {
-  //       console.log("Height: ",this.state.totalHeight);
+//   onAddItem() {
+//     /*eslint no-console: 0*/
+//     // console.log("adding", "n" + this.state.newCounter);
+//     // console.log("State - ", this.state)
+//     // console.log(JSON.stringify(this.state))
 
-  //       if(this.state.totalHeight > 15){
-  //           this.resetLayout();
-  //       }
-  //   }
+//     // const { layout } = this.state;
+//     // let clone = layout[0];
+
+//     // clone.i = "7";
+//     // clone.x = 3;
+//     // clone.y = 3;
+//     // clone.h = 4;
+//     // clone.w = 2;
+
+//     // console.log("Layout: ", layout)
+//     // layout.push(clone);
+//     // layout[0].h=5;
+
+//     this.rollBackLayout();
+//     // this.setState({ layout: layout });
+//     // this.setState({
+//     //   // Add a new item. It must have a unique key!
+//     // layout: this.state.layout.concat({
+//     //     i: "n" + this.state.newCounter,
+//     //     x: (this.state.layout.length * 2) % (this.state.cols || 12),
+//     //     y: Infinity, // puts it at the bottom
+//     //     w: 2,
+//     //     h: 2
+//     //   }),
+//     //   // Increment the counter to ensure key is always unique.
+//     //   newCounter: this.state.newCounter + 1
+//     // });
+//   }
+
+    createElement(el) {
+      const removeStyle = {
+        position: "absolute",
+        right: "2px",
+        top: 0,
+        cursor: "pointer"
+      };
+      const i = el.add ? "+" : el.i;
+      return (
+        <div key={i} data-grid={el}>
+
+          {el.add ? (
+            <span
+              className="add text"
+              onClick={this.onAddItem}
+              title="You can add an item by clicking here, too."
+            >
+              Add +
+            </span>
+          ) : (
+            <span className="text">{i}</span>
+          )}
+          <span
+            className="remove"
+            style={removeStyle}
+            onClick={this.onRemoveItem.bind(this, i)}
+          >
+            x
+          </span>
+        </div>
+      );
+    }
+
+    onRemoveItem(i) {
+        console.log("removing", i);
+        this.setState({ layout: _.reject(this.state.layout, { i: i }) });
+      }
 
   render() {
     return (
@@ -116,16 +232,16 @@ class LocalStorageLayout extends React.PureComponent {
         <div>
           <h1>Title</h1>
         </div>
-        <div
-          onMouseDown={this.handleMouseDown}
-        >
-          <button onClick={this.resetLayout}>Reset Layout</button>
+        <div onMouseDown={this.handleMouseDown}>
+          {/* <button onClick={this.resetLayout}>Reset Layout</button> */}
           <button onClick={this.setHeight}>Set Height</button>
+          {/* <button onClick={this.onAddItem}>Add Item</button> */}
           <ReactGridLayout
             {...this.props}
             layout={this.state.layout}
             onLayoutChange={this.onLayoutChange}
           >
+            {/* {_.map(this.state.layout, el => this.createElement(el))} */}
             <div key="1" data-grid={{ w: 2, h: 3, x: 0, y: 0 }}>
               <span className="text">1</span>
             </div>
