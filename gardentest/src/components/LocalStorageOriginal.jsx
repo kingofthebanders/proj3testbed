@@ -69,8 +69,8 @@ class LocalStorageLayout extends React.PureComponent {
     super(props);
 
     this.state = {
-        layout: JSON.parse(JSON.stringify(originalLayout)),
-    //   layout: testDefaultLayout,
+      layout: JSON.parse(JSON.stringify(originalLayout)),
+      //   layout: testDefaultLayout,
       totalHeight: 12,
       mouse: false,
       rollBackLayout: [],
@@ -82,7 +82,7 @@ class LocalStorageLayout extends React.PureComponent {
     this.setHeight = this.setHeight.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.rollBackLayout = this.rollBackLayout.bind(this);
-    // this.onAddItem = this.onAddItem.bind(this);
+    this.onAddItem = this.onAddItem.bind(this);
   }
 
   resetLayout() {
@@ -94,7 +94,7 @@ class LocalStorageLayout extends React.PureComponent {
 
   rollBackLayout() {
     const { rollBackLayout } = this.state;
-    console.log("Roll Back Layout: ", rollBackLayout)
+    console.log("Roll Back Layout: ", rollBackLayout);
     this.setState({ layout: rollBackLayout });
   }
 
@@ -112,7 +112,7 @@ class LocalStorageLayout extends React.PureComponent {
   }
 
   handleMouseDown() {
-      console.log("Mouse Down")
+    console.log("Mouse Down");
     this.setState({
       mouse: true,
       rollBackLayout: this.state.layout
@@ -153,96 +153,106 @@ class LocalStorageLayout extends React.PureComponent {
     }
   }
 
-//   onAddItem() {
-//     /*eslint no-console: 0*/
-//     // console.log("adding", "n" + this.state.newCounter);
-//     // console.log("State - ", this.state)
-//     // console.log(JSON.stringify(this.state))
+  onAddItem() {
+    /*eslint no-console: 0*/
+    // console.log("adding", "n" + this.state.newCounter);
+    // console.log("State - ", this.state)
+    // console.log(JSON.stringify(this.state))
 
-//     // const { layout } = this.state;
-//     // let clone = layout[0];
+    let newLayout = Array.from(this.state.layout);
 
-//     // clone.i = "7";
-//     // clone.x = 3;
-//     // clone.y = 3;
-//     // clone.h = 4;
-//     // clone.w = 2;
+    let clone = {};
 
-//     // console.log("Layout: ", layout)
-//     // layout.push(clone);
-//     // layout[0].h=5;
+    clone.i = "8";
+    clone.x = 3;
+    clone.y = 3;
+    clone.h = 4;
+    clone.w = 2;
+    clone.moved = false;
+    clone.static = false;
+    clone.add = false;
 
-//     this.rollBackLayout();
-//     // this.setState({ layout: layout });
-//     // this.setState({
-//     //   // Add a new item. It must have a unique key!
-//     // layout: this.state.layout.concat({
-//     //     i: "n" + this.state.newCounter,
-//     //     x: (this.state.layout.length * 2) % (this.state.cols || 12),
-//     //     y: Infinity, // puts it at the bottom
-//     //     w: 2,
-//     //     h: 2
-//     //   }),
-//     //   // Increment the counter to ensure key is always unique.
-//     //   newCounter: this.state.newCounter + 1
-//     // });
-//   }
+    console.log("Clone: ", clone);
+    // console.log("Layout: ", layout)
+    newLayout.push(clone);
+    console.log("New Layout: ", newLayout);
+    // layout[0].h=5;
+    // console.log(layout)
+    // this.rollBackLayout();
+    this.setState({ layout: newLayout });
 
-    createElement(el) {
-      const removeStyle = {
-        position: "absolute",
-        right: "2px",
-        top: 0,
-        cursor: "pointer"
-      };
-      const i = el.add ? "+" : el.i;
-      return (
-        <div key={i} data-grid={el}>
+    // this.setState({
+    //   // Add a new item. It must have a unique key!
+    // layout: this.state.layout.concat({
+    //     i: "7",
+    //     x: 3,
+    //     y: Infinity, // puts it at the bottom
+    //     w: 2,
+    //     h: 2
+    //   })
+    //   // Increment the counter to ensure key is always unique.
+    // //   newCounter: this.state.newCounter + 1
+    // });
+    // this.forceUpdate();
+    // this.rollBackLayout();
+  }
 
-          {el.add ? (
-            <span
-              className="add text"
-              onClick={this.onAddItem}
-              title="You can add an item by clicking here, too."
-            >
-              Add +
-            </span>
-          ) : (
-            <span className="text">{i}</span>
-          )}
+  createElement(el) {
+    console.log("In Create Element &&&&&&&&&&");
+    const removeStyle = {
+      position: "absolute",
+      right: "2px",
+      top: 0,
+      cursor: "pointer"
+    };
+    const i = el.add ? "+" : el.i;
+    return (
+      <div key={i} data-grid={el}>
+        {el.add ? (
           <span
-            className="remove"
-            style={removeStyle}
-            onClick={this.onRemoveItem.bind(this, i)}
+            className="add text"
+            onClick={this.onAddItem}
+            title="You can add an item by clicking here, too."
           >
-            x
+            Add +
           </span>
-        </div>
-      );
-    }
+        ) : (
+          <span className="text">{i}</span>
+        )}
+        <span
+          className="remove"
+          style={removeStyle}
+          onClick={this.onRemoveItem.bind(this, i)}
+        >
+          x
+        </span>
+      </div>
+    );
+  }
 
-    onRemoveItem(i) {
-        console.log("removing", i);
-        this.setState({ layout: _.reject(this.state.layout, { i: i }) });
-      }
+  onRemoveItem(i) {
+    console.log("removing", i);
+    this.setState({ layout: _.reject(this.state.layout, { i: i }) });
+  }
 
   render() {
     return (
       <React.Fragment>
         <div>
+          <button onClick={this.onAddItem}>Add Item</button>
           <h1>Title</h1>
         </div>
         <div onMouseDown={this.handleMouseDown}>
           {/* <button onClick={this.resetLayout}>Reset Layout</button> */}
           <button onClick={this.setHeight}>Set Height</button>
-          {/* <button onClick={this.onAddItem}>Add Item</button> */}
+
           <ReactGridLayout
             {...this.props}
             layout={this.state.layout}
             onLayoutChange={this.onLayoutChange}
           >
-            {/* {_.map(this.state.layout, el => this.createElement(el))} */}
-            <div key="1" data-grid={{ w: 2, h: 3, x: 0, y: 0 }}>
+            {_.map(this.state.layout, el => this.createElement(el))}
+            {/* <div key="1" data-grid={{ w: 2, h: 3, x: 0, y: 0 }}>
               <span className="text">1</span>
             </div>
             <div key="2" data-grid={{ w: 2, h: 3, x: 2, y: 0 }}>
@@ -256,7 +266,7 @@ class LocalStorageLayout extends React.PureComponent {
             </div>
             <div key="5" data-grid={{ w: 2, h: 3, x: 8, y: 0 }}>
               <span className="text">5</span>
-            </div>
+            </div> */}
           </ReactGridLayout>
         </div>
       </React.Fragment>
